@@ -10,9 +10,9 @@ public class SquareMatrix : ICloneable, IComparable<SquareMatrix>
     _size = size;
     _matrix = new int[size, size];
     Random random = new Random();
-    for (int row = 0; row < size; row++)
+    for (int row = 0; row < size; ++row)
     {
-      for (int column = 0; column < size; column++)
+      for (int column = 0; column < size; ++column)
       {
         _matrix[row, column] = random.Next(1, 10);
       }
@@ -22,7 +22,9 @@ public class SquareMatrix : ICloneable, IComparable<SquareMatrix>
   public SquareMatrix(int[,] matrix)
   {
     if (matrix.GetLength(0) != matrix.GetLength(1))
+    {
       throw new ArgumentException("Матрица должна быть квадратной.");
+    }
     _size = matrix.GetLength(0);
     _matrix = (int[,])matrix.Clone();
   }
@@ -30,12 +32,14 @@ public class SquareMatrix : ICloneable, IComparable<SquareMatrix>
   public static SquareMatrix operator +(SquareMatrix firstMatrix, SquareMatrix secondMatrix)
   {
     if (firstMatrix._size != secondMatrix._size)
+    {
       throw new MatrixSizeMismatchException("Матрицы должны быть одного размера для сложения.");
+    }
 
     int[,] result = new int[firstMatrix._size, firstMatrix._size];
-    for (int row = 0; row < firstMatrix._size; row++)
+    for (int row = 0; row < firstMatrix._size; ++row)
     {
-      for (int column = 0; column < firstMatrix._size; column++)
+      for (int column = 0; column < firstMatrix._size; ++column)
       {
         result[row, column] = firstMatrix._matrix[row, column] + secondMatrix._matrix[row, column];
       }
@@ -46,17 +50,19 @@ public class SquareMatrix : ICloneable, IComparable<SquareMatrix>
   public static SquareMatrix operator *(SquareMatrix firstMatrix, SquareMatrix secondMatrix)
   {
     if (firstMatrix._size != secondMatrix._size)
+    {
       throw new MatrixSizeMismatchException("Матрицы должны быть одного размера для умножения.");
+    }
 
     int[,] result = new int[firstMatrix._size, firstMatrix._size];
-    for (int row = 0; row < firstMatrix._size; row++)
+    for (int row = 0; row < firstMatrix._size; ++row)
     {
-      for (int column = 0; column < firstMatrix._size; column++)
+      for (int column = 0; column < firstMatrix._size; ++column)
       {
         result[row, column] = 0;
-        for (int k = 0; k < firstMatrix._size; k++)
+        for (int innerIndex = 0; innerIndex < firstMatrix._size; ++innerIndex)
         {
-          result[row, column] += firstMatrix._matrix[row, k] * secondMatrix._matrix[k, column];
+          result[row, column] += firstMatrix._matrix[row, innerIndex] * secondMatrix._matrix[innerIndex, column];
         }
       }
     }
@@ -101,23 +107,27 @@ public class SquareMatrix : ICloneable, IComparable<SquareMatrix>
   public int Determinant()
   {
     if (_size == 1)
+    {
       return _matrix[0, 0];
+    }
     if (_size == 2)
+    {
       return _matrix[0, 0] * _matrix[1, 1] - _matrix[0, 1] * _matrix[1, 0];
+    }
 
     int determinant = 0;
-    for (int i = 0; i < _size; i++)
+    for (int rowDeterminant = 0; rowDeterminant < _size; ++rowDeterminant)
     {
       int[,] subMatrix = new int[_size - 1, _size - 1];
-      for (int row = 1; row < _size; row++)
+      for (int row = 1; row < _size; ++row)
       {
-        for (int column = 0, subColumn = 0; column < _size; column++)
+        for (int column = 0, subColumn = 0; column < _size; ++column)
         {
-          if (column == i) continue;
-          subMatrix[row - 1, subColumn++] = _matrix[row, column];
+          if (column == rowDeterminant) continue;
+          subMatrix[row - 1, ++subColumn] = _matrix[row, column];
         }
       }
-      determinant += (int)Math.Pow(-1, i) * _matrix[0, i] * new SquareMatrix(subMatrix).Determinant();
+      determinant += (int)Math.Pow(-1, rowDeterminant) * _matrix[0, rowDeterminant] * new SquareMatrix(subMatrix).Determinant();
     }
     return determinant;
   }
@@ -126,23 +136,31 @@ public class SquareMatrix : ICloneable, IComparable<SquareMatrix>
   {
     int determinant = Determinant();
     if (determinant == 0)
+    {
       throw new InvalidMatrixOperationException("Матрица вырожденная, обратной матрицы не существует.");
+    }
 
     int[,] inverse = new int[_size, _size];
-    for (int row = 0; row < _size; row++)
+    for (int row = 0; row < _size; ++row)
     {
-      for (int column = 0; column < _size; column++)
+      for (int column = 0; column < _size; ++column)
       {
         int[,] subMatrix = new int[_size - 1, _size - 1];
-        for (int i = 0, subRow = 0; i < _size; i++)
+        for (int rowDeterminant = 0, subRow = 0; rowDeterminant < _size; ++rowDeterminant)
         {
-          if (i == row) continue;
-          for (int j = 0, subColumn = 0; j < _size; j++)
+          if (rowDeterminant == row)
           {
-            if (j == column) continue;
-            subMatrix[subRow, subColumn++] = _matrix[i, j];
+           continue;
           }
-          subRow++;
+          for (int columnDeterminant = 0, subColumn = 0; columnDeterminant < _size; ++columnDeterminant)
+          {
+            if (columnDeterminant == column)
+            {
+             continue;
+            }
+            subMatrix[subRow, subColumn++] = _matrix[rowDeterminant, columnDeterminant];
+          }
+          ++subRow;
         }
         inverse[column, row] = (int)Math.Pow(-1, row + column) * new SquareMatrix(subMatrix).Determinant();
       }
@@ -165,10 +183,12 @@ public class SquareMatrix : ICloneable, IComparable<SquareMatrix>
     if (obj is SquareMatrix other)
     {
       if (_size != other._size)
-        return false;
-      for (int row = 0; row < _size; row++)
       {
-        for (int column = 0; column < _size; column++)
+        return false;
+      }
+      for (int row = 0; row < _size; ++row)
+      {
+        for (int column = 0; column < _size; ++column)
         {
           if (_matrix[row, column] != other._matrix[row, column])
             return false;
@@ -187,9 +207,9 @@ public class SquareMatrix : ICloneable, IComparable<SquareMatrix>
   public override string ToString()
   {
     string result = "";
-    for (int row = 0; row < _size; row++)
+    for (int row = 0; row < _size; ++row)
     {
-      for (int column = 0; column < _size; column++)
+      for (int column = 0; column < _size; ++column)
       {
         result += _matrix[row, column] + " ";
       }

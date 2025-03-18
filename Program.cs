@@ -27,11 +27,17 @@ class Program
       Console.WriteLine("Детерминант матрицы 2: " + matrix2.Determinant());
 
       if (matrix1 > matrix2)
+      {
         Console.WriteLine("Детерминант матрицы 1 больше.");
+      }
       else if (matrix1 < matrix2)
+      {
         Console.WriteLine("Детерминант матрицы 1 меньше.");
+      }
       else
+      {
         Console.WriteLine("Детерминанты равны.");
+      }
 
       SquareMatrix inverseMatrix1 = matrix1.Inverse();
       Console.WriteLine("Обратная матрица 1:");
