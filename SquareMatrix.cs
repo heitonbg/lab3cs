@@ -5,6 +5,7 @@ public class SquareMatrix
     private int[,] _matrix;
     private int _size;
 
+
     public SquareMatrix(int size)
     {
         _size = size;
@@ -41,5 +42,41 @@ public class SquareMatrix
             result += "\n";
         }
         return result;
+    }
+
+    public static SquareMatrix operator +(SquareMatrix firstMatrix, SquareMatrix secondMatrix)
+    {
+        if (firstMatrix._size != secondMatrix._size)
+            throw new MatrixSizeMismatchException("Матрицы должны быть одного размера для сложения.");
+
+        int[,] result = new int[firstMatrix._size, firstMatrix._size];
+        for (int row = 0; row < firstMatrix._size; row++)
+        {
+            for (int column = 0; column < firstMatrix._size; column++)
+            {
+                result[row, column] = firstMatrix._matrix[row, column] + secondMatrix._matrix[row, column];
+            }
+        }
+        return new SquareMatrix(result);
+    }
+
+    public static SquareMatrix operator *(SquareMatrix firstMatrix, SquareMatrix secondMatrix)
+    {
+        if (firstMatrix._size != secondMatrix._size)
+            throw new MatrixSizeMismatchException("Матрицы должны быть одного размера для умножения.");
+
+        int[,] result = new int[firstMatrix._size, firstMatrix._size];
+        for (int row = 0; row < firstMatrix._size; row++)
+        {
+            for (int column = 0; column < firstMatrix._size; column++)
+            {
+                result[row, column] = 0;
+                for (int k = 0; k < firstMatrix._size; k++)
+                {
+                    result[row, column] += firstMatrix._matrix[row, k] * secondMatrix._matrix[k, column];
+                }
+            }
+        }
+        return new SquareMatrix(result);
     }
 }
