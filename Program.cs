@@ -43,17 +43,13 @@ class Program
       Console.WriteLine("Обратная матрица 1:");
       Console.WriteLine(inverseMatrix1);
     }
-    catch (MatrixSizeMismatchException ex)
-    {
-      Console.WriteLine("Ошибка: " + ex.Message);
-    }
-    catch (InvalidMatrixOperationException ex)
+    catch (Exception ex) when (ex is InvalidMatrixOperationException || ex is MatrixSizeMismatchException)
     {
       Console.WriteLine("Ошибка: " + ex.Message);
     }
     catch (Exception ex)
     {
-      Console.WriteLine("Ошибка: " + ex.Message);
+      Console.WriteLine("Неожиданная ошибка: " + ex.Message);
     }
   }
 }

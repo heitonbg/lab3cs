@@ -168,9 +168,14 @@ public class SquareMatrix : ICloneable, IComparable<SquareMatrix>
     return new SquareMatrix(inverse);
   }
 
-  public object Clone()
+  public SquareMatrix DeepClone()
   {
     return new SquareMatrix((int[,])_matrix.Clone());
+  }
+
+  public object Clone()
+  {
+    return DeepClone();  
   }
 
   public int CompareTo(SquareMatrix other)
